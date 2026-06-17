@@ -1,6 +1,8 @@
 package com.example.paceapp.model;
 
 public class Usuario extends Pessoa{
+    private static final long serialVersionUID = 1L;
+
     private String email;
     private String senha;
     private String telefone;

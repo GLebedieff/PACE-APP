@@ -1,10 +1,7 @@
 package com.example.paceapp;
 
-import com.example.paceapp.view.LoginView;
 import com.example.paceapp.view.MainView;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;

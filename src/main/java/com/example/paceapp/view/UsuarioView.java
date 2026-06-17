@@ -5,18 +5,26 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class LoginView {
+public class UsuarioView {
+    //atributos gerais da classe
     private VBox main;
     private final double largura = 500;
     private final double altura = 300;
     private Scene login;
 
-    public LoginView(){
+    //componentes da cena
+    private TextField nomeInput;
+    private TextField emailInput;
+    private PasswordField senhaInput;
+    private TextField telefoneInput;
+
+    public UsuarioView(){
         this.main = new VBox();
         this.login = new Scene(main, largura, altura);
     }
@@ -43,29 +51,54 @@ public class LoginView {
                 "-fx-background-color: blue;" +
                 "");
 
-        VBox loginBox = new VBox();
-        Text loginTitulo = new Text("Login");
+        VBox cadastroBox = new VBox();
+        Text cadastroTitulo = new Text("Cadastro");
+
+        VBox nome = new VBox();
+        Label nomeLabel = new Label("Nome");
+        this.nomeInput = new TextField();
+        nome.getChildren().addAll(nomeLabel, nomeInput);
 
         VBox email = new VBox();
         Label emailLabel = new Label("Email");
-        TextArea emailInput = new TextArea();
+        this.emailInput = new TextField();
         email.getChildren().addAll(emailLabel, emailInput);
 
         VBox senha = new VBox();
         Label senhaLabel = new Label("Senha");
-        TextArea senhaInput = new TextArea();
+        this.senhaInput = new PasswordField();
         senha.getChildren().addAll(senhaLabel, senhaInput);
 
-        Button btnLogin = new Button();
+        VBox telefone = new VBox();
+        Label telefoneLabel = new Label("Telefone");
+        this.telefoneInput = new TextField();
+        telefone.getChildren().addAll(telefoneLabel, telefoneInput);
 
-        loginBox.getChildren().addAll(loginTitulo, email, senha, btnLogin);
-        loginBox.setStyle("-fx-background-color: brown;");
-        loginBox.setAlignment(Pos.CENTER);
-        loginBox.setPadding(new Insets(15));
+        Button btnCadastro = new Button();
 
-        principal.getChildren().add(loginBox);
+        cadastroBox.getChildren().addAll(cadastroTitulo, nome, email, senha, telefone, btnCadastro);
+        cadastroBox.setStyle("-fx-background-color: brown;");
+        cadastroBox.setAlignment(Pos.CENTER);
+        cadastroBox.setPadding(new Insets(15));
+
+        principal.getChildren().add(cadastroBox);
         principal.setAlignment(Pos.CENTER);
         principal.setPadding(new Insets(30));
+    }
 
+    public String getNome(){
+        return nomeInput.getText();
+    }
+
+    public String getEmail(){
+        return emailInput.getText();
+    }
+
+    public String getSenha(){
+        return senhaInput.getText();
+    }
+
+    public String getTelefone(){
+        return telefoneInput.getText();
     }
 }
