@@ -1,6 +1,7 @@
 package com.example.paceapp;
 
 import com.example.paceapp.view.LoginView;
+import com.example.paceapp.view.MainView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -11,9 +12,9 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        LoginView login = new LoginView();
-        stage.setTitle("Login");
-        stage.setScene(login.getCena());
+        MainView mainView = new MainView();
+        stage.setTitle("PACE");
+        stage.setScene(mainView.getCena());
         stage.show();
     }
     public static void main(String[] args){
