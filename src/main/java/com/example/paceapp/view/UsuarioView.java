@@ -3,6 +3,7 @@ package com.example.paceapp.view;
 import com.example.paceapp.controller.CrudController;
 import com.example.paceapp.model.ArquivoUsuario;
 import com.example.paceapp.model.Usuario;
+import com.example.paceapp.model.ValidacaoException;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -27,12 +28,12 @@ public class UsuarioView extends BaseCrudView<Usuario> {
         colNome.setPrefWidth(120);
 
         TableColumn<Usuario, String> colEmail = new TableColumn<>("Email");
-        colNome.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colNome.setPrefWidth(120);
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colEmail.setPrefWidth(120);
 
         TableColumn<Usuario, String> colTelefone = new TableColumn<>("Telefone");
-        colNome.setCellValueFactory(new PropertyValueFactory<>("telefone"));
-        colNome.setPrefWidth(120);
+        colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        colTelefone.setPrefWidth(120);
 
         colunas.add(colNome);
         colunas.add(colEmail);

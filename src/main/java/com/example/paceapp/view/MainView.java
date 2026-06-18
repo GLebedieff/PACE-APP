@@ -71,8 +71,8 @@ public class MainView {
         btnProfessor.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Professor")));
         btnAluno.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Aluno")));
         btnProfissionalResponsavel.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Profissional Responsável")));
-        btnInstituicao.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Instituição")));
-        btnUsuario.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Usuário")));
+        btnInstituicao.setOnAction(e -> areaConteudo.getChildren().setAll(new InstituicaoView().getPane()));
+        btnUsuario.setOnAction(e -> areaConteudo.getChildren().setAll(new UsuarioView().getPane()));
         btnEmilly1.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Emilly 1")));
         btnEmilly2.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Emilly 2")));
 
