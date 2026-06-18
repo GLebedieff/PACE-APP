@@ -1,104 +1,120 @@
 package com.example.paceapp.view;
 
+import com.example.paceapp.controller.CrudController;
+import com.example.paceapp.model.ArquivoUsuario;
+import com.example.paceapp.model.Usuario;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
-public class UsuarioView {
-    //atributos gerais da classe
-    private VBox main;
-    private final double largura = 500;
-    private final double altura = 300;
-    private Scene login;
+import java.util.ArrayList;
+import java.util.List;
 
-    //componentes da cena
-    private TextField nomeInput;
-    private TextField emailInput;
-    private PasswordField senhaInput;
-    private TextField telefoneInput;
-
-    public UsuarioView(){
-        this.main = new VBox();
-        this.login = new Scene(main, largura, altura);
+public class UsuarioView extends BaseCrudView<Usuario> {
+    public UsuarioView() {
+        super("Gerenciamento de Usuários", new CrudController<>(new ArquivoUsuario()));
     }
 
-    public Scene getCena(){
-        this.construirCena();
-        return login;
+    @Override
+    protected List<TableColumn<Usuario, ?>> obterColunasDados() {
+        List<TableColumn<Usuario, ?>> colunas = new ArrayList<>();
+
+        TableColumn<Usuario, String> colNome = new TableColumn<>("Nome");
+        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colNome.setPrefWidth(120);
+
+        TableColumn<Usuario, String> colEmail = new TableColumn<>("Email");
+        colNome.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colNome.setPrefWidth(120);
+
+        TableColumn<Usuario, String> colTelefone = new TableColumn<>("Telefone");
+        colNome.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        colNome.setPrefWidth(120);
+
+        colunas.add(colNome);
+        colunas.add(colEmail);
+        colunas.add(colTelefone);
+
+        return colunas;
     }
 
-    public void construirCena(){
-        HBox cabecalho = new HBox();
-        HBox principal = new HBox();
-        main.getChildren().addAll(cabecalho, principal);
+    @Override
+    protected void abrirFormulario(Usuario usuarioExistente) {
+        TextField txtNome = new TextField();
+        TextField txtEmail = new TextField();
+        PasswordField txtSenha = new PasswordField();
+        TextField txtTelefone = new TextField();
 
-        Text cabecalhoTitulo = new Text("PACE");
+        //pega os dados enquanto estiver editando e bloqueia o email (por ele ser o id)
+        if (usuarioExistente != null) {
+            txtNome.setText(usuarioExistente.getNome());
+            txtEmail.setText(usuarioExistente.getEmail());
+            txtTelefone.setText(usuarioExistente.getTelefone());
+            txtEmail.setDisable(true);
+        }
 
-        HBox redirect = new HBox();
-        Button redirectLogin = new Button();
-        Button redirectCadastro = new Button();
-        redirect.getChildren().addAll(redirectLogin, redirectCadastro);
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(new Label("Nome:"), 0, 0);
+        grid.add(txtNome, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);
+        grid.add(txtEmail, 1, 1);
+        grid.add(new Label("Senha:"), 0, 2);
+        grid.add(txtSenha, 1, 2);
+        grid.add(new Label("Telefone:"), 0, 3);
+        grid.add(txtTelefone, 1, 3);
 
-        cabecalho.getChildren().addAll(cabecalhoTitulo, redirect);
-        cabecalho.setStyle("" +
-                "-fx-background-color: blue;" +
-                "");
+        Button btnSalvar =  new Button("Confirmar");
+        btnSalvar.setStyle("-fx-background-color: #2C4A7C; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
 
-        VBox cadastroBox = new VBox();
-        Text cadastroTitulo = new Text("Cadastro");
+        VBox layoutModal = new VBox(20, grid, btnSalvar);
+        layoutModal.setPadding(new Insets(20));
 
-        VBox nome = new VBox();
-        Label nomeLabel = new Label("Nome");
-        this.nomeInput = new TextField();
-        nome.getChildren().addAll(nomeLabel, nomeInput);
+        btnSalvar.setOnAction(e -> {
+            try {
+                String nome = txtNome.getText().trim();
+                String email = txtEmail.getText().trim();
+                String senha = txtSenha.getText();
+                String telefone = txtTelefone.getText().trim();
 
-        VBox email = new VBox();
-        Label emailLabel = new Label("Email");
-        this.emailInput = new TextField();
-        email.getChildren().addAll(emailLabel, emailInput);
+                //validacao dos campos
+                if (nome.isEmpty()) {
+                    throw new ValidacaoException("O campo 'Nome' é obrigatório.");
+                }
+                if (email.isEmpty() || !email.contains("@")){
+                    throw new ValidacaoException("Email inválido.");
+                }
+                if (senha.isEmpty()) {
+                    throw new ValidacaoException("A senha é obrigatória.");
+                }
+                if (telefone.isEmpty() || !telefone.matches("\\d+")) {
+                    throw new ValidacaoException("O campo 'Telefone' deve conter apenas números.");
+                }
 
-        VBox senha = new VBox();
-        Label senhaLabel = new Label("Senha");
-        this.senhaInput = new PasswordField();
-        senha.getChildren().addAll(senhaLabel, senhaInput);
+                Usuario novo = new Usuario(nome, email, senha, telefone);
 
-        VBox telefone = new VBox();
-        Label telefoneLabel = new Label("Telefone");
-        this.telefoneInput = new TextField();
-        telefone.getChildren().addAll(telefoneLabel, telefoneInput);
+                if (usuarioExistente == null) {
+                    controller.adicionar(novo);
+                } else {
+                    controller.atualizar(usuarioExistente.getEmail(), novo); //passa o emai antigo como chave
+                }
 
-        Button btnCadastro = new Button();
+                //fechar o modal
+                ((Stage) btnSalvar.getScene().getWindow()).close();
+            } catch (ValidacaoException ex) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Erro de Validação: ", ex.getMessage());
+            }
+        });
 
-        cadastroBox.getChildren().addAll(cadastroTitulo, nome, email, senha, telefone, btnCadastro);
-        cadastroBox.setStyle("-fx-background-color: brown;");
-        cadastroBox.setAlignment(Pos.CENTER);
-        cadastroBox.setPadding(new Insets(15));
-
-        principal.getChildren().add(cadastroBox);
-        principal.setAlignment(Pos.CENTER);
-        principal.setPadding(new Insets(30));
+        abrirModalFormulario(usuarioExistente == null ? "Cadastrar Usuário" : "Editar Usuário", layoutModal);
     }
 
-    public String getNome(){
-        return nomeInput.getText();
-    }
-
-    public String getEmail(){
-        return emailInput.getText();
-    }
-
-    public String getSenha(){
-        return senhaInput.getText();
-    }
-
-    public String getTelefone(){
-        return telefoneInput.getText();
+    @Override
+    protected void excluirItem(Usuario usuario) {
+        controller.excluir(usuario.getEmail());
     }
 }
