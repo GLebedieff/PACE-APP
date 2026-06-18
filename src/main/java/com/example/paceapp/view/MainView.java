@@ -51,8 +51,8 @@ public class MainView {
         Button btnProfissionalResponsavel = criarBotaoMenu("Profissional Responsável");
         Button btnInstituicao = criarBotaoMenu("Instituição");
         Button btnUsuario = criarBotaoMenu("Usuário");
-        Button btnEmilly1 = criarBotaoMenu("Emilly 1");
-        Button btnEmilly2 = criarBotaoMenu("Emilly 2");
+        Button btnTurma = criarBotaoMenu("Turma");
+        Button btnPedagogo = criarBotaoMenu("Pedagogo");
 
         menuLateral.getChildren().addAll(
                 menuTitulo,
@@ -62,19 +62,19 @@ public class MainView {
                 btnProfissionalResponsavel,
                 btnInstituicao,
                 btnUsuario,
-                btnEmilly1,
-                btnEmilly2
+                btnTurma,
+                btnPedagogo
         );
 
         // AÇÕES DOS BOTÕES
-        btnResponsavelLegal.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Responsável Legal")));
-        btnProfessor.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Professor")));
-        btnAluno.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Aluno")));
-        btnProfissionalResponsavel.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Profissional Responsável")));
+        btnResponsavelLegal.setOnAction(e -> areaConteudo.getChildren().setAll(new ResponsavelLegalView().getPane()));
+        btnProfessor.setOnAction(e -> areaConteudo.getChildren().setAll(new ProfessorView().getPane()));
+        btnAluno.setOnAction(e -> areaConteudo.getChildren().setAll(new AlunoView().getPane()));
+        btnProfissionalResponsavel.setOnAction(e -> areaConteudo.getChildren().setAll(new ProfissionalView().getPane()));
         btnInstituicao.setOnAction(e -> areaConteudo.getChildren().setAll(new InstituicaoView().getPane()));
         btnUsuario.setOnAction(e -> areaConteudo.getChildren().setAll(new UsuarioView().getPane()));
-        btnEmilly1.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Emilly 1")));
-        btnEmilly2.setOnAction(e -> areaConteudo.getChildren().setAll(new Label("CRUD Emilly 2")));
+        btnTurma.setOnAction(e -> areaConteudo.getChildren().setAll(new TurmaView().getPane()));
+        btnPedagogo.setOnAction(e -> areaConteudo.getChildren().setAll(new PedagogoView().getPane()));
 
         // MONTAGEM FINAL
         root.setTop(topo);

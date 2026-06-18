@@ -3,10 +3,9 @@ package com.example.paceapp.model;
 import java.io.*;
 import java.util.ArrayList;
 
-public class ArquivoUsuario implements Persistencia<Usuario>{
+public class ArquivoUsuario {
     private static final String CAMINHO_ARQUIVO = "usuarios.dat";
 
-    @Override
     public void salvarLista(ArrayList<Usuario> lista){
         try{
             File arq = new File(CAMINHO_ARQUIVO);
@@ -21,7 +20,6 @@ public class ArquivoUsuario implements Persistencia<Usuario>{
         }
     }
 
-    @Override
     public ArrayList<Usuario> lerLista() {
         ArrayList<Usuario> lista = new ArrayList<>();
         File arq = new File(CAMINHO_ARQUIVO);
@@ -36,7 +34,6 @@ public class ArquivoUsuario implements Persistencia<Usuario>{
     }
 
     //Create
-    @Override
     public void adicionar(Usuario novo) {
         ArrayList<Usuario> lista = lerLista();
         lista.add(novo);
@@ -44,8 +41,7 @@ public class ArquivoUsuario implements Persistencia<Usuario>{
     }
 
     //Update
-    @Override
-    public void atualizar(String emailAntigo, Usuario atualizado){ //o emailAntigo é como se fosse o id de busca
+    public void atualizar(String emailAntigo, Usuario atualizado){
         ArrayList<Usuario> lista = lerLista();
         for (int i = 0; i < lista.size(); i++){
             if(lista.get(i).getEmail().equalsIgnoreCase(emailAntigo)){
@@ -57,12 +53,9 @@ public class ArquivoUsuario implements Persistencia<Usuario>{
     }
 
     //Delete
-    @Override
     public void excluir(String email){
         ArrayList<Usuario> lista = lerLista();
         lista.removeIf(usuario -> usuario.getEmail().equalsIgnoreCase(email));
         salvarLista(lista);
     }
-
-
 }

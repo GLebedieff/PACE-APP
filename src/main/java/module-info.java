@@ -5,5 +5,4 @@ module com.example.paceapp {
     exports com.example.paceapp;
     exports com.example.paceapp.model;
     exports com.example.paceapp.view;
-    exports com.example.paceapp.controller;
 }

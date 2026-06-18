@@ -1,31 +1,58 @@
 package com.example.paceapp.view;
 
-import com.example.paceapp.controller.CrudController;
 import com.example.paceapp.model.ArquivoInstituicao;
 import com.example.paceapp.model.Instituicao;
 import com.example.paceapp.model.ValidacaoException;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class InstituicaoView extends BaseCrudView<Instituicao> {
+public class InstituicaoView {
+
+    private final ArquivoInstituicao arquivo = new ArquivoInstituicao();
+    private VBox rootPane;
+    private TableView<Instituicao> tabela;
 
     public InstituicaoView() {
-        super("Gerenciamento de Instituições", new CrudController<>(new ArquivoInstituicao()));
+        this.rootPane = new VBox(15);
+        this.rootPane.setPadding(new Insets(20));
+        this.rootPane.setStyle("-fx-background-color: white;");
+        construirInterface();
     }
 
-    @Override
-    protected List<TableColumn<Instituicao, ?>> obterColunasDados() {
-        List<TableColumn<Instituicao, ?>> colunas = new ArrayList<>();
+    public VBox getPane() {
+        atualizarTabela();
+        return rootPane;
+    }
+
+    private void construirInterface() {
+        HBox cabecalho = new HBox();
+        cabecalho.setAlignment(Pos.CENTER_LEFT);
+        cabecalho.setSpacing(20);
+
+        Label titulo = new Label("Gerenciamento de Instituições");
+        titulo.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C4A7C;");
+
+        Button btnNovo = new Button("Novo Cadastro");
+        btnNovo.setStyle("-fx-background-color: #2C4A7C; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+        btnNovo.setOnAction(e -> abrirFormulario(null));
+        cabecalho.getChildren().addAll(titulo, btnNovo);
+
+        tabela = new TableView<>();
+        tabela.setPrefHeight(400);
 
         TableColumn<Instituicao, String> colRazaoSocial = new TableColumn<>("Razão Social");
         colRazaoSocial.setCellValueFactory(new PropertyValueFactory<>("razaoSocial"));
@@ -47,17 +74,52 @@ public class InstituicaoView extends BaseCrudView<Instituicao> {
         colEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
         colEndereco.setPrefWidth(120);
 
-        colunas.add(colRazaoSocial);
-        colunas.add(colNomeFantasia);
-        colunas.add(colCnpj);
-        colunas.add(colData);
-        colunas.add(colEndereco);
+        TableColumn<Instituicao, Void> colAcoes = new TableColumn<>("Ações");
+        colAcoes.setPrefWidth(200);
+        colAcoes.setCellFactory(param -> new TableCell<Instituicao, Void>() {
+            private final Button btnEditar = new Button("Editar");
+            private final Button btnExcluir = new Button("Excluir");
+            private final HBox container = new HBox(8, btnEditar, btnExcluir);
 
-        return colunas;
+            {
+                btnEditar.setStyle("-fx-background-color: #F5C842; -fx-text-fill: #2C4A7C; -fx-font-weight: bold; -fx-cursor: hand;");
+                btnExcluir.setStyle("-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+                container.setAlignment(Pos.CENTER);
+
+                btnEditar.setOnAction(e -> {
+                    Instituicao item = getTableView().getItems().get(getIndex());
+                    abrirFormulario(item);
+                });
+
+                btnExcluir.setOnAction(e -> {
+                    Instituicao item = getTableView().getItems().get(getIndex());
+                    Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION, "Confirmar exclusão?", ButtonType.YES, ButtonType.NO);
+                    confirmacao.showAndWait().ifPresent(resposta -> {
+                        if (resposta == ButtonType.YES) {
+                            arquivo.excluir(item.getCnpj());
+                            atualizarTabela();
+                        }
+                    });
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : container);
+            }
+        });
+
+        tabela.getColumns().addAll(colRazaoSocial, colNomeFantasia, colCnpj, colData, colEndereco, colAcoes);
+        rootPane.getChildren().addAll(cabecalho, tabela);
     }
 
-    @Override
-    protected void abrirFormulario(Instituicao instituicaoExistente) {
+    private void atualizarTabela() {
+        ArrayList<Instituicao> lista = arquivo.lerLista();
+        tabela.setItems(FXCollections.observableArrayList(lista));
+    }
+
+    private void abrirFormulario(Instituicao instituicaoExistente) {
         TextField txtRazaoSocial = new TextField();
         TextField txtNomeFantasia = new TextField();
         TextField txtCnpj = new TextField();
@@ -102,19 +164,10 @@ public class InstituicaoView extends BaseCrudView<Instituicao> {
                 String dataStr = txtDataFundacao.getText().trim();
                 String endereco = txtEndereco.getText().trim();
 
-                if (razaoSocial.isEmpty()) {
-                    throw new ValidacaoException("O campo 'Razão Social' é obrigatório.");
-                }
+                if (razaoSocial.isEmpty()) throw new ValidacaoException("O campo 'Razão Social' é obrigatório.");
+                if (nomeFantasia.isEmpty()) throw new ValidacaoException("O campo 'Nome Fantasia' é obrigatório.");
+                if (!cnpj.matches("\\d{14}")) throw new ValidacaoException("O CNPJ deve conter exatamente 14 dígitos numéricos.");
 
-                if (nomeFantasia.isEmpty()) {
-                    throw new ValidacaoException("O campo 'Nome Fantasia' é obrigatório.");
-                }
-
-                if (!cnpj.matches("\\d{14}")) {
-                    throw new ValidacaoException("O CNPJ deve conter exatamente 14 dígitos numéricos.");
-                }
-
-                // validacao de data (Formato dd/MM/yyyy)
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 try {
                     LocalDate.parse(dataStr, formatter);
@@ -122,16 +175,14 @@ public class InstituicaoView extends BaseCrudView<Instituicao> {
                     throw new ValidacaoException("A data deve estar no formato DD/MM/AAAA.");
                 }
 
-                if (endereco.isEmpty()) {
-                    throw new ValidacaoException("O campo 'Endereço' é obrigatório.");
-                }
+                if (endereco.isEmpty()) throw new ValidacaoException("O campo 'Endereço' é obrigatório.");
 
                 Instituicao nova = new Instituicao(razaoSocial, nomeFantasia, cnpj, dataStr, endereco);
 
                 if (instituicaoExistente == null) {
-                    controller.adicionar(nova);
+                    arquivo.adicionar(nova);
                 } else {
-                    controller.atualizar(instituicaoExistente.getCnpj(), nova);
+                    arquivo.atualizar(instituicaoExistente.getCnpj(), nova);
                 }
 
                 ((Stage) btnSalvar.getScene().getWindow()).close();
@@ -140,11 +191,19 @@ public class InstituicaoView extends BaseCrudView<Instituicao> {
             }
         });
 
-        abrirModalFormulario(instituicaoExistente == null ? "Cadastrar Instituição" : "Editar Instituição", layoutModal);
+        Stage stageModal = new Stage();
+        stageModal.setTitle(instituicaoExistente == null ? "Cadastrar Instituição" : "Editar Instituição");
+        stageModal.initModality(Modality.APPLICATION_MODAL);
+        stageModal.setScene(new Scene(layoutModal, 400, 320));
+        stageModal.showAndWait();
+        atualizarTabela();
     }
 
-    @Override
-    protected void excluirItem(Instituicao instituicao) {
-        controller.excluir(instituicao.getCnpj());
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String conteudo) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(conteudo);
+        alerta.showAndWait();
     }
 }
